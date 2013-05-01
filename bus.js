@@ -15,22 +15,22 @@ define(function(require) {
             while (messageQueue.length > 0) {
                 socket.send(messageQueue.pop());
             }
-        }
+        };
 
         socket.onmessage = function(message) {
-            parsed = JSON.parse(message.data);
-            responseId = parsed["id"];
+            var parsed = JSON.parse(message.data);
+            var responseId = parsed.id;
             if (responseId in callbacks) {
-                callbacks[responseId](parsed["result"]);
+                callbacks[responseId](parsed.result);
                 delete callbacks[responseId];
             } 
-        }
-    };
+        };
+    }
 
     var Bus = {};
 
     Bus.sendMessage = function(method, params, callback) {
-        if (socket == null) {
+        if (socket === null) {
             start();
         }
 
