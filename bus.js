@@ -1,17 +1,26 @@
 define(function(require) {
-    var port = null;
     var lastId = 0;
     var callbacks = {};
     var messageQueue = [];
     var socket = null;
 
     function start() {
-        var search = window.location.search;
-        var port = search.split("=")[1];
+        var params = {};
 
-        socket = new WebSocket("ws://localhost:" + port);
+        var search = window.location.search.substring(1);
+        var splitted_search = search.split("&");
+        for (var i = 0; i < splitted_search.length; i++) {
+            var splitted_param = splitted_search[i].split("=");
+            params[splitted_param[0]] = splitted_param[1];
+        }
+
+        socket = new WebSocket("ws://localhost:" + params.port);
 
         socket.onopen = function() {
+            socket.send(JSON.stringify({"method": "authenticate",
+                                        "id": "authenticate",
+                                        "params": [params.key]}));
+
             while (messageQueue.length > 0) {
                 socket.send(messageQueue.pop());
             }
