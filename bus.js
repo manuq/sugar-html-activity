@@ -8,9 +8,11 @@ define(function(require) {
         socket = new WebSocket("ws://localhost:" + window.sugarPort);
 
         socket.onopen = function() {
+            params = [window.sugarId, window.sugarKey]
+
             socket.send(JSON.stringify({"method": "authenticate",
                                         "id": "authenticate",
-                                        "params": [window.sugarKey]}));
+                                        "params": params}));
 
             while (messageQueue.length > 0) {
                 socket.send(messageQueue.pop());
@@ -27,10 +29,12 @@ define(function(require) {
         };
     }
 
-    if (window.sugarKey) {
+    if (window.sugarKey &&
+        window.sugarPort &&
+        window.sugarId) {
         start();
     } else {
-        window.onSugarKeySet = function() {
+        window.onSugarAuthSet = function() {
             start();
         }
     }
