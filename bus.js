@@ -1,7 +1,7 @@
 define(function(require) {
     var lastId = 0;
     var callbacks = {};
-    var messageQueue = [];
+    var queue = [];
     var socket = null;
 
     function start() {
@@ -14,8 +14,8 @@ define(function(require) {
                                         "id": "authenticate",
                                         "params": params}));
 
-            while (messageQueue.length > 0) {
-                socket.send(messageQueue.pop());
+            while (queue.length > 0) {
+                socket.send(queue.pop());
             }
         };
 
@@ -27,6 +27,14 @@ define(function(require) {
                 delete callbacks[responseId];
             } 
         };
+    }
+
+    function sendOrQueue(data) {
+        if (socket.readyState == WebSocket.OPEN) {
+            socket.send(data);
+        } else {
+            queue.push(data);
+        }
     }
 
     if (window.sugarKey &&
@@ -41,22 +49,52 @@ define(function(require) {
 
     var Bus = {};
 
+    function OutputStream() {
+        this.streamId = null;
+    };
+
+    OutputStream.prototype.open = function(callback) {
+        var me = this;
+        Bus.sendMessage("open_stream", [], function(result) {
+            me.streamId = result;
+            callback();
+        });
+    };
+
+    OutputStream.prototype.write = function(data) {
+        var buffer = new ArrayBuffer(data.byteLength + 1);
+
+        var bufferView = new Uint8Array(buffer);
+        bufferView[0] = this.streamId;
+        bufferView.set(new Uint8Array(data), 1);
+
+        Bus.sendBinary(buffer);
+    };
+
+    OutputStream.prototype.close = function() {
+        Bus.sendMessage("close_stream", [this.streamId]);
+    };
+
+    Bus.createOutputStream = function(callback) {
+        return new OutputStream();
+    };
+
     Bus.sendMessage = function(method, params, callback) {
         message = {"method": method,
                    "id": lastId,
                    "params": params};
 
-        callbacks[lastId] = callback;
-
-        var stringMessage = JSON.stringify(message);
-
-        if (socket.readyState == WebSocket.OPEN) {
-            socket.send(stringMessage);
-        } else {
-            messageQueue.push(stringMessage);
+        if (callback) {
+            callbacks[lastId] = callback;
         }
 
+        sendOrQueue(JSON.stringify(message));
+
         lastId++;
+    };
+
+    Bus.sendBinary = function(buffer, callback) {
+        sendOrQueue(buffer);
     };
 
     return Bus;
