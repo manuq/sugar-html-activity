@@ -1,15 +1,15 @@
-define(function(require) {
+define(function (require) {
     var shortcut = require("sugar-html-core/shortcut");
 
     var activity = {};
 
     var bus = require("sugar-html-core/bus");
 
-    activity.setup = function() {
+    activity.setup = function () {
         shortcut.add("Ctrl", "Q", this.close);
     };
 
-    activity.getXOColor = function(callback) {
+    activity.getXOColor = function (callback) {
         try {
             bus.sendMessage("activity.get_xo_color", [], callback);
         }
@@ -20,7 +20,7 @@ define(function(require) {
         }
     };
 
-    activity.close = function(callback) {
+    activity.close = function (callback) {
         try {
             bus.sendMessage("activity.close", [], callback);
         }
