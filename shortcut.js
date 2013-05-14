@@ -1,9 +1,9 @@
-define(function(require) {
+define(function (require) {
     var shortcut = {};
 
     shortcut._allShortcuts = [];
 
-    shortcut.add = function(modifiersString, key, callback) {
+    shortcut.add = function (modifiersString, key, callback) {
         // Parse the modifiers.  For example "Ctrl+Alt" will become
         // {'ctrlKey': true, 'altKey': true, 'shiftKey': false}
         var modifiersList = modifiersString.toLowerCase().split("+");
@@ -20,7 +20,7 @@ define(function(require) {
         });
     };
 
-    document.onkeypress = function(e) {
+    document.onkeypress = function (e) {
         e = e || window.event;
 
         var modifiers = {
