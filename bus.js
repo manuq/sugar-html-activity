@@ -17,7 +17,7 @@ define(function(require) {
                                         "params": params}));
 
             while (queue.length > 0) {
-                socket.send(queue.pop());
+                socket.send(queue.shift());
             }
         };
 
