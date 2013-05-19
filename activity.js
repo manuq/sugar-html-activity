@@ -1,5 +1,5 @@
 define(function (require) {
-    var shortcut = require("sugar-html-core/shortcut");
+    var shortcut = require("sugar-html-activity/shortcut");
 
     var activity = {};
 
