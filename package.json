@@ -1,3 +1,7 @@
 {
-    "volo": {}
+  "volo": {
+    "dependencies": {
+      "sugar-html-bus": "github:sugarlabs/sugar-html-bus/master"
+    }
+  }
 }
